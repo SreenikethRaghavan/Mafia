@@ -1,5 +1,11 @@
 const config = require('../../config.json');
-const NightStateChangeEvents = require('../../Events/GameStateEvents/NightStateChangeEvents');
+
+const loadLobbyEvents = require('../../Events/LobbyEvents');
+const loadVoteEvents = require('../../Events/VoteEvents');
+const loadGameStartEvents = require('../../Events/GameStartEvents');
+const { loadNightTimeEvents } = require('../../Events/NightTimeVoteEvents');
+const loadStateChangeEvents = require('../../Events/GameStateEvents/StateChangeEvents');
+
 const MafiaGame = require('../../domain/MafiaGame');
 const Room = require('../../domain/Room');
 const Player = require('../../domain/Player');
@@ -20,7 +26,11 @@ module.exports.createMafiaGameWithOnePlayerMock = function (port) {
     mafiaGame.gameRoomsDict[roomID] = new Room();
 
     io.on('connection', (socket) => {
-        NightStateChangeEvents.eventHandlersRegistration(io, socket, mafiaGame);
+        loadLobbyEvents(io, socket, mafiaGame);
+        loadVoteEvents(io, socket, mafiaGame);
+        loadGameStartEvents(io, socket, mafiaGame);
+        loadNightTimeEvents(io, socket, mafiaGame);
+        loadStateChangeEvents(io, socket, mafiaGame);
         socket.player = new Player(socket.id, roomID, '', '');
         socket.join(roomID);
     });
